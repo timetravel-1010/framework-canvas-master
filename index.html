@@ -1,0 +1,1136 @@
+<canvas id="canvas" width="1000" height="600"></canvas>
+<script src="web-lib/processing.js"></script>
+<script src="web-lib/functional-light.js"></script>
+<audio controls src="gumaft.mp3" autoplay> </audio>
+<script>
+
+  //Vamos a usar http://processingjs.org/
+
+  // Importamos las librerias
+  let { cons, first, isEmpty, isList, length, rest } = functionalLight;
+
+  function pantallaComp() {
+    let x = document.getElementById("canvas");
+
+    if(x.mozRequestFullScreen){
+      x.mozRequestFullScreen();
+    }
+    else if (x.webkitRequestFullscreen) {
+      x.webkitRequestFullscreen();
+    }
+  }
+
+  const inicial = {
+
+    //esta es la snake. Un arreglo de objetos donde el primero representa la cabeza...
+    snake: [{ x: 100, y: 100 }, { x: 90, y: 100 }, { x: 80, y: 100 }], ancho: 10, alto: 10,
+    // ultimaTecla representará la tecla oprimida por el jugador
+    ultimaTecla: "derecha",
+    // representa el score del jugador
+    score: 0,
+    // la propiedad perder es un booleano que será true cuando la snake se muerda a si misma o toque un obstaculo
+    perder: false,
+    // Representación de el best score
+    // Representa las coordenadas de los obstaculos 
+    obstaculos: [
+      { x: 0, y: 0, ancho: 400, alto: 10 },
+      { x: 600, y: 0, ancho: 400, alto: 10 },
+      { x: 0, y: 590, ancho: 400, alto: 10 },
+      { x: 600, y: 590, ancho: 400, alto: 10 },
+      { x: 0, y: 0, ancho: 10, alto: 200 },
+      { x: 0, y: 400, ancho: 10, alto: 200 },
+      { x: 990, y: 0, ancho: 10, alto: 200 },
+      { x: 990, y: 400, ancho: 10, alto: 200 },
+      { x: 190, y: 200, ancho: 600, alto: 50 },
+      { x: 190, y: 400, ancho: 600, alto: 50 }
+    ],
+    // Representa un booleano que deteminará si ocurre un Easter Egg
+    EE: ((Math.round(Math.random() * 10) / 10) == 0.2),
+    //representa la posicion inicial del "ave" que actua como easter egg
+    snakeEE: [{ x: 0, y: 310 }],
+    // Un booleano que define si el juego está en pausa
+    pausa: false,
+    //Booleanoque define si se está disparando
+    disparo: false,
+    //Posicion de la bala, empieza asi para que aparezca por fuera del canvas
+    bala: { x: "no", y: "no" },
+    //aumenta cuando se detecta que la snake paso por encima de bonus (parecido a cuando come)
+    municion: 0,
+    //se configura de acuerdo con la ultima direccion que tenia la snake al presionar la barra espaciadora, para que la bala no persiga a la serpiente
+    direccionBala: "derecha",
+    //toma el valor x o y que tenia la snake al momento de disparar y le suma 300 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
+    limite: 0,
+    portal: { x: 800, y: 310 },//rectangulo para cambiar de nivel
+    nivel: 1,
+    niveldebonus: true//determina si el nivel actual es apto para que aparezca un bonus
+
+
+  };
+
+  const nivel2 = {
+    obstaculos: [{ x: 400, y: 0, ancho: 10, alto: 250 },
+    { x: 550, y: 150, ancho: 500, alto: 10 },
+    { x: 0, y: 350, ancho: 450, alto: 10 },
+    { x: 600, y: 250, ancho: 10, alto: 350 }],
+    ultimaTecla: 'derecha',
+    //la propiedad "comida" es un objeto con x,y. Y estos están configurados para que sean totalmente aleatorios al cagar el juego
+    comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+    // la propiedad perder es un booleano que serÃ¡ true cuando la snake se muerda a si misma o toque un obstaculo
+    perder: false
+
+  };
+
+  const nivel3 = {
+    obstaculos: [{ x: 0, y: 150, ancho: 500, alto: 10 },
+    { x: 0, y: 300, ancho: 500, alto: 10 },
+    { x: 0, y: 450, ancho: 500, alto: 10 },
+    { x: 500, y: 0, ancho: 10, alto: 600 }],
+    ultimaTecla: 'derecha',
+    //la propiedad "comida" es un objeto con x,y. Y estos están configurados para que sean totalmente aleatorios al cagar el juego
+    comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+    // la propiedad perder es un booleano que serÃ¡ true cuando la snake se muerda a si misma o toque un obstaculo
+    perder: false
+
+  };
+
+  const nivel4 = {
+    obstaculos: [{ x: 0, y: 0, ancho: 100, alto: 10 },
+    { x: 300, y: 0, ancho: 450, alto: 10 },
+    { x: 0, y: 590, ancho: 150, alto: 10 },
+    { x: 600, y: 200, ancho: 400, alto: 10 },
+    { x: 0, y: 0, ancho: 10, alto: 100 },
+    { x: 0, y: 450, ancho: 10, alto: 200 },
+    { x: 450, y: 10, ancho: 10, alto: 200 },
+    { x: 600, y: 350, ancho: 10, alto: 250 },
+    { x: 0, y: 200, ancho: 450, alto: 10 },
+    { x: 0, y: 350, ancho: 1000, alto: 10 }],
+    ultimaTecla: 'derecha',
+    comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+
+  };
+
+  // FUNCIONES AUXILIARES 
+
+  /*search: any,List -> Boolean
+  Verifica si un item se encuentra como elemento dentro de una lista l y retorna true o false
+  function search(item, l)
+  */
+
+  function search(item, l) {
+    if (isEmpty(l)) {
+      return false;
+    } else if (first(l).x == item.x && first(l).y == item.y) {
+      return true;
+    } else {
+      return search(item, rest(l));
+    }
+  }
+
+  /*
+  search2: any, List -> Boolean
+  Verifica si un item es igual a algun elemento de la lista ingresada
+  function search2(item, l)
+  */
+  function search2(item, l) {
+    if (isEmpty(l)) {
+      return false;
+    } else if (first(l) == item) {
+      return true
+    } else {
+      return search2(item, rest(l))
+    }
+  }
+
+  /**
+   * guardar_localStorageBS : [] -> none
+   * Recibe un mundo, y guarda su atributo "best score" en el localStorage
+   */
+  function guardar_localStorageBS(world) {
+    localStorage.setItem("Best Score", world.bestScore)
+  }
+
+
+  /**
+ * guardar_localStorageBS : [] -> any
+ * llama el atributo "best score" del localStorage
+ */
+  function obtener_localStorageBS(world) {
+    localStorage.getItem("Best Score")
+  }
+
+
+  /* remove:any,List->List
+            Eliminar un elemento "item" de una lista  "l" y retornar la lista restante
+            Ejemplos:
+        
+            console.log(remove(2,[1,4,2,5,6])) // [1,4,5,6]
+            console.log(remove(true,[false,true,"hola","mundo"])) // [false,"hola","mundo"]
+            console.log(remove(2,[4,5,6,7,8])) // [4,5,6,7,8]
+        
+        */
+  function remove(item, l) {
+    if (isEmpty(l)) {
+      return [];
+    } else if (first(l) === item) {
+      return rest(l);
+    } else {
+      return cons(first(l), remove(item, rest(l)));
+    }
+  }
+
+
+  /**
+   * colision2: object, object -> boolean
+   * confirma si dos objetos tienen las mismas propidades X y Y
+  */
+  function colision2(obj1, obstaculo) {
+    return ((obj1.x >= obstaculo.x && obj1.x <= obstaculo.x + obstaculo.ancho) &&
+      (obj1.y >= obstaculo.y && obj1.y <= obstaculo.y + obstaculo.alto));
+  }
+
+
+  /**
+   * make: world, object -> world
+   * recibe un objeto "data" y le modifica o agrega una propiedad "attribute"
+   */
+  function make(data, attribute) {
+    return Object.assign({}, data, attribute);
+  }
+
+
+  /* 
+  obj: any,any->object
+  crear un objeto con dos parametros x,y
+  function obj(x,y)
+  ejemplos: obj(2,3) => {2, 3}
+            obj('a', 'c') => {'a', 'c'}
+  */
+  function obj(x, y) {
+    return { x, y }
+  }
+
+  /*append: list, list -> list
+  concatenar dos listas ingresadas
+  function append(x,y)
+  */
+  function append(x, y) {
+    if (isEmpty(x)) {
+      return y
+    }
+    if (length(x) == 1) {
+      return cons(first(x), y)
+    } else {
+      return cons(first(x), append(rest(x), y))
+    }
+  }
+
+  /*
+  last: list -> []
+  Funcion que retorna el ultimo elemento de una lista ingresada
+  function last(x)
+  */
+  function last(x) {
+    return x[length(x) - 1]
+  }
+
+  /*
+  aplicar: function, list -> list
+  funcion que simula un mapeado (aplica una funcion a todos los elementos de una lista)
+  function aplicar(funcion, x)
+  */
+  function aplicar(funcion, x) {
+    if (isEmpty(x)) {
+      return []
+    }
+    else {
+      return cons(funcion(first(x)), aplicar(funcion, rest(x)))
+    };
+  }
+
+  /*
+  colision: obj, obj -> bool
+  esta funcion comprueba si hay colision un objeto con otro
+  function colision(obj1,obstaculo)
+  */
+  function colision(obj1, obstaculo) {
+    return ((obj1.x >= obstaculo.x && obj1.x <= obstaculo.x + obstaculo.ancho - 10) &&
+      (obj1.y >= obstaculo.y && obj1.y <= obstaculo.y + obstaculo.alto - 10))
+  }
+
+  /*
+  aplicar1: function, [], [] -> list
+  aplicar una funcion con dos parametros a dos elementos x e y
+  */
+  function aplicar2(funcion, x, y) {
+    if (isEmpty(x)) {
+      return []
+    }
+    else {
+      return cons(funcion(y, first(x)), aplicar2(funcion, rest(x), y))
+    };
+  }
+
+  /*
+  sumamil: obj -> obj
+  sumar 1000 a las propiedades x e y de un objeto
+  function sumamil(obj)
+  */
+  function sumamil(obj) {
+    return { x: obj.x + 1000, y: obj.y }
+  }
+
+
+  /*
+  colisionbotones: obj, obj
+  detectar si la posicion del primer objeto se encuentra en el area del segundo
+  function colisionbotones(mouse, boton)
+  */
+  function colisionbotones(mouse, boton) {
+    return ((mouse.x >= boton.x && mouse.x <= boton.x + boton.ancho) &&
+      (mouse.y >= boton.y && mouse.y <= boton.y + boton.alto))
+  }
+
+
+  /*
+  contador: list, number, obj -> number
+  dada una lista, un acumulador y un objeto, determinar la posicion del objeto de la lista con la que colosiono el objeto ingresado
+  function contador(lis, acum, obj)
+  */
+  function contador(lis, acum, obj) {
+
+    if (isEmpty(lis)) {
+
+      return [];
+
+    } else if (colision2(obj, first(lis))) {
+
+      return acum;
+
+    } else {
+      return contador(rest(lis), acum + 1, obj);
+    }
+  }
+
+  /*
+  removerI: number, list -> list
+  eliminar el elemento en la posicion n de una lista ingresada
+  function removerI(n, x)
+  */
+
+  function removerI(n, x) {
+    if (n >= 0 || n <= longitud(x)) {
+      if (isEmpty(x)) {
+        return [];
+      } else {
+        return remove(x[n], x)
+      }
+    }
+  }
+
+
+  /*
+  cambiodenivel: number -> any
+  determina el nivel que se cargará de acuerdo al puntaje
+  function cambiodenivel(score)
+  ejemplos: cambiodenivel(5) => nivel2
+            cambiodenivel(15) => nivel4
+  */
+  function cambiodenivel(score) {
+
+    switch (score) {
+
+      case 5:
+        return nivel2;
+        break;
+
+      case 10:
+        return nivel3;
+        break;
+
+      case 15:
+        return nivel4;
+        break;
+    }
+  }
+
+  /*
+  puntajenivel: number -> bool
+  determina si el puntaje permite cambiar de nivel
+  function puntajenivel(score) 
+  ejemplos: puntajenivel(5) => true
+            puntajenivel(10) => true
+
+  */
+  function puntajenivel(score) {
+
+    switch (score) {
+
+      case 5:
+        return true;
+        break;
+
+      case 10:
+        return true;
+        break;
+
+      case 15:
+        return true;
+        break;
+    }
+  }
+
+
+  /*
+  moverBala: any, string => any
+  mueve la bala deacuerdo a world.direccionBala
+  function moverBala(bala,ultimatecla)
+  */
+  function moverBala(bala, direccionBala) {
+    switch (direccionBala) {
+
+      case "derecha":
+        return { x: bala.x + 20, y: bala.y }
+        break;
+
+      case "izquierda":
+        return { x: bala.x - 20, y: bala.y }
+        break;
+
+      case "abajo":
+        return { x: bala.x, y: bala.y + 20 }
+        break;
+
+      case "arriba":
+        return { x: bala.x, y: bala.y - 20 }
+        break;
+    }
+  }
+
+  /*
+  limitebala: any, number
+  determina si la bala alcanzó su limite
+  function limitebala(posicionbala, limite)
+  ejemplos: limitebala({x: 100, y: 50}, 100) => true
+            limitebala({x: 690, y: 150}, 400) => false
+  */
+  function limitebala(posicionbala, limite) {
+    if (posicionbala.x == limite || posicionbala.y == limite) {
+      return true;
+    } else { return false }
+  }
+
+  /*
+  fijarlimite: string, any -> number
+  establece el limite de la bala de acuerdo a la posicion en la que fue lanzada
+  function fijarlimite(ultimatecla, posicionsnake)
+  ejemplos:   fijarlimite("arriba", {x: 100, y: 400}) => 100
+              fijarlimite("derecha", {x: 450, y: 100}) => 750 
+  */
+  function fijarlimite(ultimatecla, posicionsnake) {
+
+    switch (ultimatecla) {
+
+      case "arriba":
+        return posicionsnake.y - 300;
+        break;
+
+      case "abajo":
+        return posicionsnake.y + 300;
+        break;
+
+      case "izquierda":
+        return posicionsnake.x - 300;
+        break;
+
+      case "derecha":
+        return posicionsnake.x + 300;
+        break;
+    }
+  }
+
+  /*
+  nivelesdebonus: number -> bool
+  determina si el nivel actual es apto para el bonus
+  function nivelesdebonus(nivel)
+  ejemplos: niveldebonus(4) => true
+            nivelesdebonus(3) => false
+  */
+  function nivelesdebonus(nivel) {
+    if (nivel == 1 || nivel == 4) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+
+
+  function sketchProc(processing) {
+
+
+
+    /*  Estas son las imagenes.
+    */
+   
+    const pregame = processing.loadImage("./imagenes/pregame1.png"); // este es el menu
+    const img = processing.loadImage("./imagenes/niveles/fondo1.png"); // este es el fondo
+    //Snake -----------------------------------------------------------
+    const cuerpo = processing.loadImage("./imagenes/snake/nivel1/cuerpo.png");
+    const cabeza = processing.loadImage("./imagenes/snake/nivel1/cabezaDER.png");
+    const cabezaIZQ = processing.loadImage("./imagenes/snake/nivel1/cabezaIZQ.png");
+    const cabezaABA = processing.loadImage("./imagenes/snake/nivel1/cabezaABA.png");
+    const cabezaARR = processing.loadImage("./imagenes/snake/nivel1/cabezaARR.png");
+    // -------------------------------------------------------------------------------
+    const huevo = processing.loadImage("./imagenes/Comida/Huevo.png"); // comida
+    const condor = processing.loadImage("./imagenes/condor.png"); // Easter Egg(Cóndor)
+    const gameOver = processing.loadImage("./imagenes/gameOver.png"); // pantalla de Game Over
+    // Este es el disparo -------------------------------------------------------------------
+    const venenoDER = processing.loadImage('./imagenes/veneno/venenoDER.png'); 
+    const venenoIZQ = processing.loadImage('./imagenes/veneno/venenoIZQ.png');
+    const venenoABA = processing.loadImage('./imagenes/veneno/venenoABA.png');
+    const venenoARR = processing.loadImage('./imagenes/veneno/venenoARR.png');
+    //_------------------------------------------------------------------------------------
+    const bonus = processing.loadImage('./imagenes/Comida/municion.png'); // caja de municion
+    const pausa = processing.loadImage('./imagenes/pausa.png'); // imagen de pausa
+    const instrucciones = processing.loadImage('./imagenes/instrucciones.png') // imagen de instrucciones
+
+
+
+    /**
+     * Esto se llama antes de iniciar el juego
+     */
+
+    processing.setup = function (world) {
+      let buscandoBS = function () {
+        if (localStorage.getItem("Best Score")) {
+          return parseInt(localStorage.getItem("Best Score"))
+        } else {
+          return 0;
+        }
+      }
+
+      processing.size(1000, 600);
+      processing.background(10, 200, 50);
+      processing.state = {
+        //esta es la snake. Un arreglo de objetos donde el primero representa la cabeza...
+        snake: [{ x: 100, y: 100 }, { x: 90, y: 100 }, { x: 80, y: 100 }], ancho: 30, alto: 30,
+
+        // ultimaTecla representará la tecla oprimida por el jugador
+        ultimaTecla: "derecha",
+
+        // representa el score del jugador
+        score: 0,
+
+        //la propiedad "comida" es un objeto con x,y. Y estos están configurados para que sean totalmente aleatorios al cagar el juego
+        comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+
+        // la propiedad perder es un booleano que será true cuando la snake se muerda a si misma o toque un obstaculo
+        perder: false,
+
+        // Representación de el best score
+        bestScore: buscandoBS(),
+
+        // Representa las coordenadas de los obstaculos 
+        obstaculos: [
+          { x: 0, y: 0, ancho: 400, alto: 10 },
+          { x: 600, y: 0, ancho: 400, alto: 10 },
+          { x: 0, y: 590, ancho: 400, alto: 10 },
+          { x: 600, y: 590, ancho: 400, alto: 10 },
+          { x: 0, y: 0, ancho: 10, alto: 200 },
+          { x: 0, y: 400, ancho: 10, alto: 200 },
+          { x: 990, y: 0, ancho: 10, alto: 200 },
+          { x: 990, y: 400, ancho: 10, alto: 200 },
+          { x: 190, y: 200, ancho: 600, alto: 50 },
+          { x: 190, y: 400, ancho: 600, alto: 50 }
+        ],
+
+        // Representa un booleano que deteminará si ocurre un Easter Egg
+        EE: ((Math.round(Math.random() * 10) / 10) == 0.2),
+
+        //representa la posicion inicial del "ave" que actua como easter egg
+        snakeEE: [{ x: 0, y: 310 }],
+
+        // Representa el estado del juego
+        game: "off",
+
+        //posicion y tamaño del boton "Play"
+        botonJugar: [
+          { x: 308, y: 254, ancho: 355, alto: 73 },
+          { x: 315, y: 244, ancho: 74, alto: 90 }],
+        botonInstrucciones: [
+          { x: 345, y: 390, ancho: 274, alto: 55 },
+          { x: 352, y: 382, ancho: 53, alto: 70 }],
+
+        // Un booleano que define si el juego está en pausa
+        pausa: false,
+
+        //un booleano que define si el juego está en modo "instrucciones"
+        instrucciones: false,
+
+        //Booleano que define si se está disparando
+        disparo: false,
+
+        //Posicion de la bala, empieza asi para que aparezca por fuera del canvas
+        bala: { x: "no", y: "no" },
+
+        //la posicion de la caja de "municion"
+        bonus: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+
+        //aumenta cuando se detecta que la snake paso por encima del bonus (parecido a cuando come)
+        municion: 0,
+
+        //se configura de acuerdo con la ultima direccion que tenia la snake al presionar la barra espaciadora, para que la bala no persiga a la serpiente
+        direccionBala: "derecha",
+
+        //toma el valor x o y que tenia la snake al momento de disparar y le suma o resta 300 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
+        limite: 0,
+
+        //posicion del rectangulo que actua como portal para pasar de nivel
+        portal: { x: 800, y: 310 },
+
+        //representa el nivel actual del juego
+        nivel: 1,
+
+        //determina si el nivel actual es apto para que aparezca un bonus
+        niveldebonus: true
+
+
+      };
+    }
+
+
+
+
+    /**
+    * Actualiza el mundo cada vez que se oprime una tecla. Retorna el nuevo stado del mundo
+    */
+    processing.onKeyEvent = function (world, keyCode) {
+
+      if (world.game == "on") {
+
+        // En esta funcion se modifica la propiedad ultimaTecla dependiendo del keyCode que el jugador oprima
+        switch (keyCode) {
+
+          case processing.UP:
+            processing.frameRate(2000);
+
+            if (world.ultimaTecla != "abajo") {
+
+              return make(world, { ultimaTecla: "arriba" });
+
+            } else { return make(world, {}) }
+            break;
+
+          case processing.DOWN:
+            processing.frameRate(2000);
+
+            if (world.ultimaTecla != "arriba") {
+              return make(world, { ultimaTecla: "abajo" });
+
+            } else { return make(world, {}) }
+            break;
+
+          case processing.LEFT:
+            processing.frameRate(2000);
+
+            if (world.ultimaTecla != "derecha") {
+              return make(world, { ultimaTecla: "izquierda" });
+
+            } else { return make(world, {}) }
+            break;
+
+          case processing.RIGHT:
+            processing.frameRate(2000);
+
+            if (world.ultimaTecla != "izquierda") {
+              return make(world, { ultimaTecla: "derecha" });
+
+            } else { return make(world, {}) }
+            break;
+
+
+          // estas son configuraciones a la letra "k" y "l" que se han hecho para realizar pruebas
+          case 75:
+
+            return make(make(world, inicial), {
+              comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
+              EE: ((Math.round(Math.random() * 10) / 10) == 0.2),
+              bonus: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) }
+            })
+            break;
+
+          //tecla "l" para establecer el bestScore al score actual sin importar que sea menor
+          case 76:
+
+            return make(world, { bestScore: world.score })
+            break;
+
+          //tecla "p" para activar la pausa
+          case 80:
+            if (world.perder != true){
+            return world.pausa === true ? make(world, { pausa: false }) : make(world, { pausa: true })
+            }else {return make(world,{})}
+            break;
+
+          //barra espaciadora para disparar
+          case 32:
+
+            if (world.municion > 0) {//solamente se activa si tiene municion
+
+              return make(world,
+                {
+                  disparo: true,
+                  bala: first(world.snake),
+                  municion: world.municion - 1,
+                  limite: fijarlimite(world.ultimaTecla, first(world.snake)),
+                  direccionBala: world.ultimaTecla
+                });
+
+            } else {
+              return make(world, {});
+            }
+            break;
+          case 77:
+            return make(world, { game: "off", instrucciones: false })
+            break;
+
+
+
+          default:
+            // el caso default basicamente retorna el mundo sin cambios (esto es en caso de que no haya ninguna tecla oprimida)
+            return make(world, {});
+        }
+
+      } else if (world.game === "off" && world.instrucciones === true) {
+        switch (keyCode) {
+          case 77:
+            return make(world, { instrucciones: false })
+            break;
+          default:
+            return make(world, {})
+            break;
+        }
+      } else {
+        return make(world, {})
+      }
+    }
+
+
+    processing.onMouseEvent = function (world, event) {
+
+      if (event.action === 'click') {
+        let mouse = { x: event.mouseX, y: event.mouseY }
+        console.log(mouse);
+
+        if (world.game === "off" && world.instrucciones === false) {
+          //comprueba si el jugador dio click en el boton jugar y si es el caso cambia la propiedad game a "on"
+          if (search2(true, aplicar2(colisionbotones, world.botonJugar, mouse))) {
+            return make(make(world, inicial), { game: "on" })
+          }
+          //comprueba si dio click en el boton instrucciones y cambia la propiedad a true
+          if (search2(true, aplicar2(colisionbotones, world.botonInstrucciones, mouse))) {
+            return make(world, { instrucciones: true })
+          }
+        } else
+          return make(world, {});
+      }
+
+      return make(world, {});
+    }
+
+
+    processing.onTic = function (world) {
+
+      guardar_localStorageBS(world)
+
+
+      if (world.game == "on" && world.pausa === false && world.instrucciones === false) {
+
+        processing.frameRate(10 + world.score);
+
+        switch (true) {
+
+
+          //aqui se determinar si la snake paso por encima del portal
+          //solamente sirve si el puntaje es igual a alguno de los de la funcion puntajenivel
+          case (first(world.snake).x == world.portal.x && first(world.snake).y == world.portal.y && puntajenivel(world.score)):
+
+            //el if es necesario para que el bonus vuelva a aparecer en el nivel 4
+            if (world.nivel == 3) {
+
+              return make(make(world, cambiodenivel(world.score)), {
+                score: world.score + 1,
+                bestScore: world.bestScore + 1,
+                snake: cons({ x: 100, y: 100 }, aplicar(sumamil, rest(world.snake))),
+                nivel: world.nivel + 1,
+                niveldebonus: true
+              });
+            } else {
+
+              return make(make(world, cambiodenivel(world.score)), {
+                score: world.score + 1,
+                bestScore: world.bestScore + 1,
+                snake: cons({ x: 100, y: 100 }, aplicar(sumamil, rest(world.snake))),
+                nivel: world.nivel + 1
+              });
+            }
+            break;
+
+
+          //En caso de que la comida se genere encima de un obstaculo o de la serpiente, la cambiará de posicion
+          case (search2(true, aplicar2(colision, world.obstaculos, world.comida)) || search2(true, aplicar2(colision, rest(world.snake), world.comida))):
+            
+            return make(world, { comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 80) }, })
+            break;
+
+
+          //para evitar que la caja de bonus aparezca en algun obstaculo o en la serpiente
+          case (search2(true, aplicar2(colision, world.obstaculos, world.bonus)) || search2(true, aplicar2(colision, rest(world.snake), world.bonus))):
+
+            return make(world, { bonus: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 80) }, });
+            break;
+
+
+          //si hay una colision de la cabeza con cualquiera de los obstaculos cambiará el booleano "perder" a true
+          case search2(true, aplicar2(colision, world.obstaculos, first(world.snake))):
+            return make(world, { perder: true })
+            break;
+
+
+
+
+          //Las siguientes condiciones hacen que la snake no se salga del canvas 
+          //-----------------------------------------------------------------------------------------------------
+          //derecha
+          case first(world.snake).x >= 1000:
+
+            return make(world, { snake: cons(obj(first(world.snake).x - 1000, first(world.snake).y), rest(world.snake)) })
+            break;
+
+
+          //izquierda
+          case first(world.snake).x < 0:
+
+            return make(world, { snake: cons(obj(first(world.snake).x + 1000, first(world.snake).y), rest(world.snake)) })
+            break;
+
+
+          //arriba
+          case first(world.snake).y < 0:
+
+            return make(world, { snake: cons(obj(first(world.snake).x, first(world.snake).y + 600), rest(world.snake)) })
+            break;
+
+
+          //abajo
+          case first(world.snake).y >= 600:
+            return make(world, { snake: cons(obj(first(world.snake).x, first(world.snake).y - 600), rest(world.snake)) })
+            break;
+          // ------------------------------------------------------------------------------------------------------
+
+
+          /* esta condicion comprueba si la posicion de la cabeza de la snake (primer objeto de arreglo) es igual a alguna del cuerpo, si es el caso, entonces es porque la snake "se mordió a si misma" y hace un make a la propiedad "perder" cambiandola a true
+          */
+          case search(first(world.snake), rest(world.snake)):
+
+            return make(world, { perder: true })
+            break;
+
+
+          /* esta condicion comprueba si la cabeza de la serpiente está en la misma posicion de la comida.
+          Si es el caso, cambia la posicion de la comida a una aleatoria, le suma un punto al score, aumenta la velocidad y añade un nuevo objeto al final del arreglo de la snake
+         */
+          case first(world.snake).x === world.comida.x && first(world.snake).y === world.comida.y:
+          processing.frameRate(2000);
+            // Si el score y el best score son iguales, entonces le suma un punto a cada uno
+            if (world.score >= world.bestScore) {
+
+              return make(world,
+                {
+                  comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 80) },
+                  score: world.score + 1,
+                  // de esta forma añadimos un cuadro al final del arreglo de objetos que es la snake
+                  snake: append(world.snake, [{ x: last(world.snake).x, y: last(world.snake).y }]),
+                  bestScore: world.bestScore + 1,
+                });
+
+              // si no es así, entonces solo aumenta el score
+            } else {
+
+              return make(world, {
+                comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 80) },
+                score: world.score + 1,
+                // de esta forma añadimos un cuadro al final del arreglo de objetos que es la snake
+                snake: append(world.snake, [{ x: last(world.snake).x, y: last(world.snake).y }])
+              });
+            }
+            break;
+
+
+          //aqui se detecta si la snake paso por encima del bonus
+          //al pasar por primera vez, la propiedad niveldebonus pasa a false porque en el nivel 1 solamente puede tomar una vez el bonus
+          case first(world.snake).x === world.bonus.x && first(world.snake).y === world.bonus.y && nivelesdebonus(world.nivel) && world.niveldebonus:
+
+            return make(world,
+              {
+                municion: world.municion + 1,
+                bonus: {
+                  x: (Math.round(Math.random() * 10) / 10) * 900,
+                  y: ((Math.round(Math.random() * 10) / 10) * 500 + 80), ancho: 10, alto: 10
+                },
+                niveldebonus: false
+              });
+            break;
+
+
+
+          /*
+           aqui se detecta si hay una colision de la bala con alguno de los obstaculos, 
+           se hace uso de la funcion contador y removerI para eliminar el obstaculo con el que impacto la bala
+          */
+          case (world.disparo && search2(true, aplicar2(colision2, world.obstaculos, world.bala))):
+
+            return make(world,
+              {
+                obstaculos: removerI(contador(world.obstaculos, 0, world.bala), world.obstaculos),
+                disparo: false,
+                bala: { x: "no", y: "no" }
+              });
+            break;
+
+
+          //para evitar que la comida y la caja de bonus aparezcan en el mismo lugar
+          case (world.comida.x == world.bonus.x && world.comida.y == world.bonus.y):
+
+            return make(world, {
+              bonus: {
+                x: (Math.round(Math.random() * 10) / 10) * 900,
+                y: ((Math.round(Math.random() * 10) / 10) * 500 + 80),
+                ancho: 10,
+                alto: 10
+              }
+            })
+            break;
+
+
+          //determina si la bala alcanzó su limite, si es asi pasa disparo a false y mueve la bala
+          case (world.disparo && limitebala(world.bala, world.limite)):
+
+            return make(world, { disparo: false, bala: { x: "no", y: "no" } });
+            break;
+
+
+
+          //-----------------------------------------------------------------------------------------  
+
+          //En estas condiciones se configura el movimiento de la serpiente dependiendo de ultimaTecla
+
+
+          case world.ultimaTecla == "derecha":
+
+            return make(world,
+              {
+                snake: cons(obj(first(world.snake).x + 10, first(world.snake).y), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 10, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -10, y: -10 }
+              });
+            break;
+
+          case world.ultimaTecla == "arriba":
+
+            return make(world,
+              {
+                snake: cons(obj(first(world.snake).x, first(world.snake).y - 10), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 10, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -10, y: -10 }
+              });
+            break;
+
+          case world.ultimaTecla == "abajo":
+
+            return make(world,
+              {
+                snake: cons(obj(first(world.snake).x, first(world.snake).y + 10), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 10, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -10, y: -10 }
+              });
+            break;
+
+          case world.ultimaTecla == "izquierda":
+            return make(world,
+              {
+                snake: cons(obj(first(world.snake).x - 10, first(world.snake).y), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 10, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -10, y: -10 }
+              });
+            break;
+        }
+      } else {
+        return make(world, {})
+      }
+
+    }
+
+
+
+    // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
+    processing.drawGame = function (world) {
+
+
+
+      if (world.game == "on") {
+
+        // esta funcion recibe un objeto y pinta un cuadro con sus propiedades x,y
+        let constructor = function (obj) {
+          return processing.image(cuerpo, obj.x, obj.y, 30, 30)
+          //processing.rect(obj.x, obj.y, 10, 10)
+        }
+
+        let pintarEscenario = function (obj) {
+          return processing.rect(obj.x, obj.y, obj.ancho, obj.alto)
+        }
+
+        processing.background(10, 200, 50);
+        processing.image(img, 0, 0, 1000, 600);//fondo
+
+
+
+        //pinta el bonus si el nivel y la propiedad niveldebonus son correctos
+        if (nivelesdebonus(world.nivel) && world.niveldebonus) {
+          processing.image(bonus, world.bonus.x, world.bonus.y, world.bonus.ancho, world.bonus.alto);
+        }
+
+        //pinta comida
+        //Si el puntaje es el necesario para cambiar de nivel no la pinta para evitar que siga comiendo
+        if (!puntajenivel(world.score) == true) {
+          processing.image(huevo, world.comida.x, world.comida.y, 10, 10);
+        }
+
+
+        //pinta el portal si el puntaje es uno correcto
+        if (puntajenivel(world.score)) {
+          processing.fill(200, 200, 200)
+          processing.rect(795, 305, 20, 20)
+          processing.fill(10, 10, 10)
+          processing.rect(world.portal.x, world.portal.y, 10, 10);
+        }
+
+        //crea la bala de acuerdo a las posiciones de world.bala
+        if (world.disparo == true) {
+          switch(world.direccionBala){
+            case "derecha" :
+            processing.image(venenoDER, world.bala.x, world.bala.y, 10, 10)
+            break;
+            case "izquierda" :
+            processing.image(venenoIZQ, world.bala.x, world.bala.y, 10, 10)
+            break;
+            case "abajo" :
+            processing.image(venenoABA, world.bala.x, world.bala.y, 10, 10)
+            break;
+            case "arriba" :
+            processing.image(venenoARR, world.bala.x, world.bala.y, 10, 10)
+            break;
+          }
+        }
+
+
+        // aqui se pinta la cabeza de la serpiente (primer objeto del arreglo snake)
+        switch (world.ultimaTecla) {
+          case "derecha":
+            processing.image(cabeza, first(world.snake).x, first(world.snake).y, 11, 11)
+            break;
+          case "izquierda":
+            processing.image(cabezaIZQ, first(world.snake).x, first(world.snake).y, 11, 11)
+            break;
+          case "abajo":
+            processing.image(cabezaABA, first(world.snake).x, first(world.snake).y, 11, 11)
+            break;
+          case "arriba":
+            processing.image(cabezaARR, first(world.snake).x, first(world.snake).y, 11, 11)
+            break;
+        }
+
+
+        // aqui usamos la funcion que hace de mapeado para pintar el cuerpo de la serpiente
+        aplicar(constructor, rest(world.snake));
+
+
+        processing.fill(240, 240, 240);
+
+        //en estas dos lineas siguientes se pinta el marcador de "score" en la pantalla
+        processing.textFont(processing.PFont, 18);
+        processing.text("Score: " + world.score, 20, 30);
+
+        //en esta linea se pinta el marcador de "Best score" en la pantalla
+        processing.text("Best Score: " + world.bestScore, 20, 50);
+        processing.text("Ammo: " + world.municion, 20, 70);
+        processing.text("Level: " + world.nivel, 925, 30);
+
+        //aqui se pinta el escenario
+        processing.fill(0, 0, 0);
+        aplicar(pintarEscenario, world.obstaculos);
+
+
+        /* esta condicion verifica si la propiedad "perder" es igual a true, si es el caso pinta
+        en la pantalla un rectangulo y unas letras que indican que perdiste
+        */
+        if (world.perder === true) {
+          processing.image(gameOver, 0, 0, 1000, 600)
+        }
+
+        //aqui se pinta el condor
+        if (world.EE === true && world.perder != true) {
+          processing.image(condor, first(world.snakeEE).x, first(world.snakeEE).y, 78, 47);
+        }
+        if (world.pausa == true) {
+          processing.image(pausa, 0, 0, 1000, 600);//fondo
+        }
+
+      } else if (world.game != "on" && world.instrucciones === false) {
+        //esta funcion es para mostrar el funcionamiento del boton
+        let pintarBotones = function (obj) {
+          return processing.rect(obj.x, obj.y, obj.ancho, obj.alto)
+        };
+        processing.image(pregame, 0, 0, 1000, 600);
+        // aplicar(pintarBotones, world.botonJugar);
+        // aplicar(pintarBotones, world.botonInstrucciones);
+      }
+
+      if (world.instrucciones) {
+        processing.image(instrucciones, 0, 0, 1000, 600)
+      }
+    }
+
+    processing.mouseClicked = function () {
+      processing.state = processing.onMouseEvent(processing.state,
+        { action: "click", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
+    }
+
+    // Esta es la función que pinta todo. Se ejecuta 60 veces por segundo. 
+    // No cambie esta función. Su código debe ir en drawGame
+    processing.draw = function () {
+      processing.drawGame(processing.state);
+      processing.state = processing.onTic(processing.state);
+    };
+
+    // Esta función se ejecuta cada vez que presionamos una tecla. 
+    // No cambie esta función. Su código debe ir en onKeyEvent
+    processing.keyPressed = function () {
+      processing.state = processing.onKeyEvent(processing.state, processing.keyCode);
+    }
+
+  }
+
+
+
+  let canvas = document.getElementById("canvas");
+
+  // Adjuntamos nuestro sketch al framework de processing
+  let processingInstance = new Processing(canvas, sketchProc);
+</script>
+<button type="button" class="btn btn-success btnterapia"
+  onClick="window.open('Multiplayer/multiplayer.html')">Multiplayer BETA</button>
+
+
+<button type="button" class="btn btn-success btnterapia" onClick="pantallaComp()">Pantalla Completa</button>
