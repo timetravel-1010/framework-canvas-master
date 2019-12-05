@@ -267,8 +267,8 @@ const { cons, first, rest, isEmpty, isList, append, length } = require('function
   function colision(obj1,obstaculo)
   */
   function colision(obj1, obstaculo) {
-    return ((obj1.x >= obstaculo.x && obj1.x <= obstaculo.x + obstaculo.ancho - 10) &&
-      (obj1.y >= obstaculo.y && obj1.y <= obstaculo.y + obstaculo.alto - 10))
+    return ((obj1.x >= obstaculo.x && obj1.x <= obstaculo.x + obstaculo.ancho) &&
+      (obj1.y >= obstaculo.y && obj1.y <= obstaculo.y + obstaculo.alto))
   }
 
   /*

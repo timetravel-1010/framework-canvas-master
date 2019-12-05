@@ -50,7 +50,7 @@
     municion: 0,
     //se configura de acuerdo con la ultima direccion que tenia la snake al presionar la barra espaciadora, para que la bala no persiga a la serpiente
     direccionBala: "derecha",
-    //toma el valor x o y que tenia la snake al momento de disparar y le suma 300 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
+    //toma el valor x o y que tenia la snake al momento de disparar y le suma 200 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
     limite: 0,
     portal: { x: 800, y: 310 },//rectangulo para cambiar de nivel
     nivel: 1,
@@ -74,7 +74,7 @@
 
   const nivel3 = {
     obstaculos: [{ x: 0, y: 150, ancho: 500, alto: 10 },
-    { x: 0, y: 300, ancho: 500, alto: 10 },
+    { x: 0, y: 200, ancho: 500, alto: 10 },
     { x: 0, y: 450, ancho: 500, alto: 10 },
     { x: 500, y: 0, ancho: 10, alto: 600 }],
     ultimaTecla: 'derecha',
@@ -87,7 +87,7 @@
 
   const nivel4 = {
     obstaculos: [{ x: 0, y: 0, ancho: 100, alto: 10 },
-    { x: 300, y: 0, ancho: 450, alto: 10 },
+    { x: 200, y: 0, ancho: 450, alto: 10 },
     { x: 0, y: 590, ancho: 150, alto: 10 },
     { x: 600, y: 200, ancho: 400, alto: 10 },
     { x: 0, y: 0, ancho: 10, alto: 100 },
@@ -154,7 +154,7 @@
       processing.background(10, 200, 50);
       processing.state = {
         //esta es la snake. Un arreglo de objetos donde el primero representa la cabeza...
-        snake: [{ x: 100, y: 100 }, { x: 70, y: 100 }, { x: 40, y: 100 }], ancho: 30, alto: 30,
+        snake: [{ x: 100, y: 100 }, { x: 80, y: 100 }, { x: 60, y: 100 }], ancho: 20, alto: 20,
 
         // ultimaTecla representará la tecla oprimida por el jugador
         ultimaTecla: "derecha",
@@ -196,7 +196,7 @@
 
         //posicion y tamaño del boton "Play"
         botonJugar: [
-          { x: 308, y: 254, ancho: 355, alto: 73 },
+          { x: 208, y: 254, ancho: 355, alto: 73 },
           { x: 315, y: 244, ancho: 74, alto: 90 }],
         botonInstrucciones: [
           { x: 345, y: 390, ancho: 274, alto: 55 },
@@ -223,7 +223,7 @@
         //se configura de acuerdo con la ultima direccion que tenia la snake al presionar la barra espaciadora, para que la bala no persiga a la serpiente
         direccionBala: "derecha",
 
-        //toma el valor x o y que tenia la snake al momento de disparar y le suma o resta 300 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
+        //toma el valor x o y que tenia la snake al momento de disparar y le suma o resta 200 para que asi, cuando la posicion de la bala sea igual a este limite la bala se elimine
         limite: 0,
 
         //posicion del rectangulo que actua como portal para pasar de nivel
@@ -547,8 +547,8 @@
               bonus: {
                 x: (Math.round(Math.random() * 10) / 10) * 900,
                 y: ((Math.round(Math.random() * 10) / 10) * 500 + 80),
-                ancho: 10,
-                alto: 10
+                ancho: 20,
+                alto: 20
               }
             })
             break;
@@ -571,9 +571,9 @@
 
             return make(world,
               {
-                snake: cons(obj(first(world.snake).x + 30, first(world.snake).y), remove(last(world.snake), world.snake)),
-                snakeEE: cons(obj(first(world.snakeEE).x + 30, first(world.snakeEE).y), rest(world.snakeEE)),
-                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -30, y: -30 }
+                snake: cons(obj(first(world.snake).x + 20, first(world.snake).y), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 20, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -20, y: -20 }
               });
             break;
 
@@ -581,9 +581,9 @@
 
             return make(world,
               {
-                snake: cons(obj(first(world.snake).x, first(world.snake).y - 30), remove(last(world.snake), world.snake)),
-                snakeEE: cons(obj(first(world.snakeEE).x + 30, first(world.snakeEE).y), rest(world.snakeEE)),
-                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -30, y: -30 }
+                snake: cons(obj(first(world.snake).x, first(world.snake).y - 20), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 20, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -20, y: -20 }
               });
             break;
 
@@ -591,18 +591,18 @@
 
             return make(world,
               {
-                snake: cons(obj(first(world.snake).x, first(world.snake).y + 30), remove(last(world.snake), world.snake)),
-                snakeEE: cons(obj(first(world.snakeEE).x + 30, first(world.snakeEE).y), rest(world.snakeEE)),
-                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -30, y: -30 }
+                snake: cons(obj(first(world.snake).x, first(world.snake).y + 20), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 20, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -20, y: -20 }
               });
             break;
 
           case world.ultimaTecla == "izquierda":
             return make(world,
               {
-                snake: cons(obj(first(world.snake).x - 30, first(world.snake).y), remove(last(world.snake), world.snake)),
-                snakeEE: cons(obj(first(world.snakeEE).x + 30, first(world.snakeEE).y), rest(world.snakeEE)),
-                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -30, y: -30 }
+                snake: cons(obj(first(world.snake).x - 20, first(world.snake).y), remove(last(world.snake), world.snake)),
+                snakeEE: cons(obj(first(world.snakeEE).x + 20, first(world.snakeEE).y), rest(world.snakeEE)),
+                bala: world.disparo === true ? moverBala(world.bala, world.direccionBala) : { x: -20, y: -20 }
               });
             break;
         }
@@ -623,7 +623,7 @@
 
         // esta funcion recibe un objeto y pinta un cuadro con sus propiedades x,y
         let constructor = function (obj) {
-          return processing.image(cuerpo, obj.x, obj.y, 30, 30)
+          return processing.image(cuerpo, obj.x, obj.y, 20, 20)
           //processing.rect(obj.x, obj.y, 10, 10)
         }
 
@@ -644,16 +644,16 @@
         //pinta comida
         //Si el puntaje es el necesario para cambiar de nivel no la pinta para evitar que siga comiendo
         if (!puntajenivel(world.score) == true) {
-          processing.image(huevo, world.comida.x, world.comida.y, 30, 30);
+          processing.image(huevo, world.comida.x, world.comida.y, 20, 20);
         }
 
 
         //pinta el portal si el puntaje es uno correcto
         if (puntajenivel(world.score)) {
           processing.fill(200, 200, 200)
-          processing.rect(795, 305, 20, 20)
+          processing.rect(795, 205, 20, 20)
           processing.fill(10, 10, 10)
-          processing.rect(world.portal.x, world.portal.y, 30, 30);
+          processing.rect(world.portal.x, world.portal.y, 20, 20);
         }
 
         //crea la bala de acuerdo a las posiciones de world.bala
@@ -678,16 +678,16 @@
         // aqui se pinta la cabeza de la serpiente (primer objeto del arreglo snake)
         switch (world.ultimaTecla) {
           case "derecha":
-            processing.image(cabeza, first(world.snake).x, first(world.snake).y, 30, 30)
+            processing.image(cabeza, first(world.snake).x, first(world.snake).y, 20, 20)
             break;
           case "izquierda":
-            processing.image(cabezaIZQ, first(world.snake).x, first(world.snake).y, 30, 30)
+            processing.image(cabezaIZQ, first(world.snake).x, first(world.snake).y, 20, 20)
             break;
           case "abajo":
-            processing.image(cabezaABA, first(world.snake).x, first(world.snake).y, 30, 30)
+            processing.image(cabezaABA, first(world.snake).x, first(world.snake).y, 20, 20)
             break;
           case "arriba":
-            processing.image(cabezaARR, first(world.snake).x, first(world.snake).y, 30, 30)
+            processing.image(cabezaARR, first(world.snake).x, first(world.snake).y, 20, 20)
             break;
         }
 
