@@ -6,6 +6,7 @@ require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=
  * @returns {Array}
  * @example cons(1, [2, 3]); // => [1, 2, 3]
  */
+
 function cons(value, list) {
     let tmp = list.slice(0);
     tmp.splice(0, 0, value);
