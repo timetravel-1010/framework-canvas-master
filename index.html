@@ -33,14 +33,14 @@
     // Representación de el best score
     // Representa las coordenadas de los obstaculos 
     obstaculos: [
-      { x: 0, y: 0, ancho: 400, alto: 10 },
-      { x: 600, y: 0, ancho: 400, alto: 10 },
-      { x: 0, y: 590, ancho: 400, alto: 10 },
+      { x: 0,   y: 0,   ancho: 400, alto: 10 },
+      { x: 600, y: 0,   ancho: 400, alto: 10 },
+      { x: 0,   y: 590, ancho: 400, alto: 10 },
       { x: 600, y: 590, ancho: 400, alto: 10 },
-      { x: 0, y: 0, ancho: 10, alto: 200 },
-      { x: 0, y: 400, ancho: 10, alto: 200 },
-      { x: 990, y: 0, ancho: 10, alto: 200 },
-      { x: 990, y: 400, ancho: 10, alto: 200 },
+      { x: 0,   y: 0,   ancho: 10,  alto: 200 },
+      { x: 0,   y: 400, ancho: 10,  alto: 200 },
+      { x: 990, y: 0,   ancho: 10,  alto: 200 },
+      { x: 990, y: 400, ancho: 10,  alto: 200 },
       { x: 190, y: 200, ancho: 600, alto: 50 },
       { x: 190, y: 400, ancho: 600, alto: 50 }
     ],
@@ -68,10 +68,11 @@
   };
 
   const nivel2 = {
-    obstaculos: [{ x: 400, y: 0, ancho: 10, alto: 250 },
+    obstaculos: [
+    { x: 400, y: 0,   ancho: 10,  alto: 250 },
     { x: 550, y: 150, ancho: 500, alto: 10 },
-    { x: 0, y: 350, ancho: 450, alto: 10 },
-    { x: 600, y: 250, ancho: 10, alto: 350 }],
+    { x: 0,   y: 350,   ancho: 450, alto: 10 },
+    { x: 600, y: 250, ancho: 10,  alto: 350 }],
     ultimaTecla: 'derecha',
     //la propiedad "comida" es un objeto con x,y. Y estos están configurados para que sean totalmente aleatorios al cagar el juego
     comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
@@ -81,10 +82,11 @@
   };
 
   const nivel3 = {
-    obstaculos: [{ x: 0, y: 150, ancho: 500, alto: 10 },
-    { x: 0, y: 200, ancho: 500, alto: 10 },
-    { x: 0, y: 450, ancho: 500, alto: 10 },
-    { x: 500, y: 0, ancho: 10, alto: 600 }],
+    obstaculos: [
+    { x: 0,   y: 150, ancho: 500, alto: 10 },
+    { x: 0,   y: 200, ancho: 500, alto: 10 },
+    { x: 0,   y: 450, ancho: 500, alto: 10 },
+    { x: 500, y: 0,   ancho: 10,  alto: 600 }],
     ultimaTecla: 'derecha',
     //la propiedad "comida" es un objeto con x,y. Y estos están configurados para que sean totalmente aleatorios al cagar el juego
     comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
@@ -94,16 +96,17 @@
   };
 
   const nivel4 = {
-    obstaculos: [{ x: 0, y: 0, ancho: 100, alto: 10 },
-    { x: 200, y: 0, ancho: 450, alto: 10 },
-    { x: 0, y: 590, ancho: 150, alto: 10 },
+    obstaculos: [
+    { x: 0,   y: 0,   ancho: 100, alto: 10 },
+    { x: 200, y: 0,   ancho: 450, alto: 10 },
+    { x: 0,   y: 590, ancho: 150, alto: 10 },
     { x: 600, y: 200, ancho: 400, alto: 10 },
-    { x: 0, y: 0, ancho: 10, alto: 100 },
-    { x: 0, y: 450, ancho: 10, alto: 200 },
-    { x: 450, y: 10, ancho: 10, alto: 200 },
-    { x: 600, y: 350, ancho: 10, alto: 250 },
-    { x: 0, y: 200, ancho: 450, alto: 10 },
-    { x: 0, y: 350, ancho: 1000, alto: 10 }],
+    { x: 0,   y: 0,   ancho: 10,  alto: 100 },
+    { x: 0,   y: 450, ancho: 10,  alto: 200 },
+    { x: 450, y: 10,  ancho: 10,  alto: 200 },
+    { x: 600, y: 350, ancho: 10,  alto: 250 },
+    { x: 0,   y: 200, ancho: 450, alto: 10 },
+    { x: 0,   y: 350, ancho: 1000, alto: 10 }],
     ultimaTecla: 'derecha',
     comida: { x: (Math.round(Math.random() * 10) / 10) * 900, y: ((Math.round(Math.random() * 10) / 10) * 500 + 90) },
 
@@ -181,14 +184,14 @@
 
         // Representa las coordenadas de los obstaculos 
         obstaculos: [
-          { x: 0, y: 0, ancho: 400, alto: 10 },
-          { x: 600, y: 0, ancho: 400, alto: 10 },
-          { x: 0, y: 590, ancho: 400, alto: 10 },
+          { x: 0,   y: 0,   ancho: 400, alto: 10 },
+          { x: 600, y: 0,   ancho: 400, alto: 10 },
+          { x: 0,   y: 590, ancho: 400, alto: 10 },
           { x: 600, y: 590, ancho: 400, alto: 10 },
-          { x: 0, y: 0, ancho: 10, alto: 200 },
-          { x: 0, y: 400, ancho: 10, alto: 200 },
-          { x: 990, y: 0, ancho: 10, alto: 200 },
-          { x: 990, y: 400, ancho: 10, alto: 200 },
+          { x: 0,   y: 0,   ancho: 10,  alto: 200 },
+          { x: 0,   y: 400, ancho: 10,  alto: 200 },
+          { x: 990, y: 0,   ancho: 10,  alto: 200 },
+          { x: 990, y: 400, ancho: 10,  alto: 200 },
           { x: 190, y: 200, ancho: 600, alto: 50 },
           { x: 190, y: 400, ancho: 600, alto: 50 }
         ],
